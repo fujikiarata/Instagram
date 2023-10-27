@@ -66,6 +66,8 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         // セル内のボタンのアクションをソースコードで設定する
         cell.likeButton.addTarget(self, action:#selector(handleButton(_:forEvent:)), for: .touchUpInside)
         
+        cell.postButton.addTarget(self, action:#selector(commentPost(_:forEvent:)), for: .touchUpInside)
+        
         return cell
     }
     
@@ -96,5 +98,27 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
             let postRef = Firestore.firestore().collection(Const.PostPath).document(postData.id)
             postRef.updateData(["likes": updateValue])
         }
+    }
+    
+    @objc func commentPost(_ sender: UIButton, forEvent event: UIEvent) {
+        // タップされたセルのインデックスを求める
+        let touch = event.allTouches?.first
+        let point = touch!.location(in: self.tableView)
+        let indexPath = tableView.indexPathForRow(at: point)
+        let cell = tableView.cellForRow(at: indexPath!) as! PostTableViewCell
+        // 配列からタップされたインデックスのデータを取り出す
+        let postData = postArray[indexPath!.row]
+        
+        // 更新データを作成する
+        var updateValue: FieldValue
+        let user = Auth.auth().currentUser!.displayName!
+        let comment = cell.textField.text!
+        // 今回新たにいいねを押した場合は、myidを追加する更新データを作成
+        updateValue = FieldValue.arrayUnion(["\(user): \(comment)"])
+        // likesに更新データを書き込む
+        let postRef = Firestore.firestore().collection(Const.PostPath).document(postData.id)
+        postRef.updateData(["comments": updateValue])
+        
+        cell.textField.text = ""
     }
 }

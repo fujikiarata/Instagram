@@ -10,6 +10,8 @@ import FirebaseStorageUI
 
 class PostTableViewCell: UITableViewCell {
     
+    @IBOutlet weak var postButton: UIButton!
+    @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var captionLabel: UILabel!
     @IBOutlet weak var likeLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
@@ -41,5 +43,9 @@ class PostTableViewCell: UITableViewCell {
             let buttonImage = UIImage(named: "like_none")
             self.likeButton.setImage(buttonImage, for: .normal)
         }
+        
+        // コメントの表示
+        let commentText = postData.comments.joined(separator: "\n")
+        captionLabel.text! += "\n"+commentText
     }
 }
